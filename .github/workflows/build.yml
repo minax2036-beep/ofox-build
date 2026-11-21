@@ -82,8 +82,7 @@ jobs:
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: OrangeFox-Galaxian
+          name: OrangeFox-vendor_boot
           path: |
-            ~/ofox/out/target/product/mgvi_64_64only_ww_armv82/OrangeFox*.zip
-            ~/ofox/out/target/product/mgvi_64_64only_ww_armv82/vendor_boot.img
-
+            /home/runner/ofox/out/target/product/mgvi_64_64only_ww_armv82/vendor_boot.img
+            /home/runner/ofox/out/target/product/mgvi_64_64only_ww_armv82/*.zip

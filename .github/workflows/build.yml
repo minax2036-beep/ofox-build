@@ -60,13 +60,13 @@ jobs:
           sed -i '/TARGET_NO_KERNEL/d' BoardConfig.mk
           sed -i '/BOARD_BOOT_HEADER_VERSION/d' BoardConfig.mk
           sed -i '/BOARD_PREBUILT_VENDOR_BOOTIMAGE/d' BoardConfig.mk
+          sed -i '/BOARD_USES_RECOVERY_AS_BOOT/d' BoardConfig.mk
           cat << 'EOF' >> BoardConfig.mk
 
           AB_OTA_PARTITIONS += boot init_boot vendor_boot dtbo vbmeta vbmeta_system vbmeta_vendor system system_ext product vendor vendor_dlkm odm_dlkm
           TARGET_NO_KERNEL := false
           BOARD_BOOT_HEADER_VERSION := 4
           BOARD_VENDOR_BOOTIMAGE_PARTITION_SIZE := 67108864
-          BOARD_USES_RECOVERY_AS_BOOT := true
           BOARD_MOVE_RECOVERY_RESOURCES_TO_VENDOR_BOOT := true
           BOARD_INCLUDE_RECOVERY_DTBO := true
           TW_MAX_BRIGHTNESS := 4095

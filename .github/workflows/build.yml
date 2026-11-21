@@ -1,0 +1,51 @@
+name: Build OrangeFox Recovery
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Free Disk Space
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc
+          df -h
+
+      - name: Install Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y git aria2 rsync curl zip unzip tar ccache lz4 python3
+
+      - name: Setup Repo & Sync OrangeFox (fox_14.1)
+        run: |
+          mkdir -p ~/ofox && cd ~/ofox
+          git config --global user.name "Builder"
+          git config --global user.email "builder@example.com"
+          git config --global color.ui false
+          curl https://googleapis.com > ~/repo
+          chmod a+x ~/repo
+          ~/repo init --depth=1 -u https://gitlab.com -b fox_14.1
+          ~/repo sync -c -j$(nproc --all) --force-sync --no-clone-bundle --no-tags
+
+      - name: Clone Device Tree
+        run: |
+          cd ~/ofox
+          git clone https://github.com device/alps/mgvi_64_64only_ww_armv82
+
+      - name: Build OrangeFox
+        run: |
+          cd ~/ofox
+          export ALLOW_MISSING_DEPENDENCIES=true
+          export FOX_BUILD_DEVICE=mgvi_64_64only_ww_armv82
+          export LC_ALL="C"
+          source build/envsetup.sh
+          lunch omni_mgvi_64_64only_ww_armv82-eng
+          mka adbd vendorbootimage
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: OrangeFox-Galaxian
+          path: |
+            ~/ofox/out/target/product/mgvi_64_64only_ww_armv82/OrangeFox*.zip
+            ~/ofox/out/target/product/mgvi_64_64only_ww_armv82/vendor_boot.img

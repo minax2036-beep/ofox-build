@@ -55,17 +55,20 @@ jobs:
           mv omni_mgvi_64_64only_ww_armv82.mk twrp_mgvi_64_64only_ww_armv82.mk
           sed -i 's/vendor\/omni/vendor\/twrp/g' twrp_mgvi_64_64only_ww_armv82.mk
           sed -i 's/omni_/twrp_/g' AndroidProducts.mk twrp_mgvi_64_64only_ww_armv82.mk
-          sed -i '/PRODUCT_STATIC_BOOT_CONTROL_HAL/,/^$/d' device.mk
+          sed -i '/TARGET_NO_KERNEL/d' BoardConfig.mk
           cat << 'EOF' >> BoardConfig.mk
 
           AB_OTA_PARTITIONS += boot init_boot vendor_boot dtbo vbmeta vbmeta_system vbmeta_vendor system system_ext product vendor vendor_dlkm odm_dlkm
+          TARGET_NO_KERNEL := false
           BOARD_VENDOR_BOOTIMAGE_PARTITION_SIZE := 67108864
+          PRODUCT_BUILD_VENDOR_BOOT_IMAGE := true
           BOARD_USES_RECOVERY_AS_BOOT := true
           BOARD_MOVE_RECOVERY_RESOURCES_TO_VENDOR_BOOT := true
           BOARD_INCLUDE_RECOVERY_DTBO := true
           TW_MAX_BRIGHTNESS := 4095
           TW_DEFAULT_BRIGHTNESS := 2048
           EOF
+
 
       - name: Build OrangeFox
         run: |

@@ -56,6 +56,13 @@ jobs:
           sed -i 's/vendor\/omni/vendor\/twrp/g' twrp_mgvi_64_64only_ww_armv82.mk
           sed -i 's/omni_/twrp_/g' AndroidProducts.mk twrp_mgvi_64_64only_ww_armv82.mk
           sed -i '/PRODUCT_STATIC_BOOT_CONTROL_HAL/,/^$/d' device.mk
+          cat << 'EOF' >> BoardConfig.mk
+
+          AB_OTA_PARTITIONS += boot init_boot vendor_boot dtbo vbmeta vbmeta_system vbmeta_vendor system system_ext product vendor vendor_dlkm odm_dlkm
+          TW_MAX_BRIGHTNESS := 4095
+          TW_DEFAULT_BRIGHTNESS := 2048
+          EOF
+
 
       - name: Build OrangeFox
         run: |

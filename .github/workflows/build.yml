@@ -22,7 +22,7 @@ jobs:
         with:
           path: |
             ~/ofox
-            ~/.ccache
+            /tmp/ccache
           key: ofox-14-1-slim-v2
           restore-keys: |
             ofox-14-1-slim-v2-
@@ -78,7 +78,7 @@ jobs:
           cd ~/ofox
           export USE_CCACHE=1
           export CCACHE_EXEC=/usr/bin/ccache
-          export CCACHE_DIR=~/.ccache
+          export CCACHE_DIR=/tmp/ccache
           mkdir -p "$CCACHE_DIR"
           ccache -M 4G
           export ALLOW_MISSING_DEPENDENCIES=true

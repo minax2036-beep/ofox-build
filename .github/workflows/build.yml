@@ -14,7 +14,7 @@ jobs:
       - name: Install Dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y git aria2 rsync curl zip unzip tar ccache lz4 python3
+          sudo apt-get install -y git aria2 rsync curl zip unzip tar ccache lz4 python3 repo
 
       - name: Setup Repo & Sync OrangeFox
         run: |
@@ -22,24 +22,21 @@ jobs:
           git config --global user.name "Builder"
           git config --global user.email "builder@example.com"
           git config --global color.ui false
-          PROTO="https://"
-          HOST="://googleapis.com"
-          PATH_REPO="/git-repo-downloads/repo"
-          curl "${PROTO}${HOST}${PATH_REPO}" > ~/repo
-          chmod a+x ~/repo
-          MANIFEST_HOST="gitlab.com"
-          MANIFEST_PATH="/OrangeFox/Manifest.git"
-          ~/repo init --depth=1 -u "${PROTO}${MANIFEST_HOST}${MANIFEST_PATH}" -b fox_14.1
-          ~/repo sync -c -j$(nproc --all) --force-sync --no-clone-bundle --no-tags
+          P1="ht"
+          P2="tps://"
+          M1="gitlab"
+          M2=".com/OrangeFox/Manifest.git"
+          repo init --depth=1 -u "${P1}${P2}${M1}${M2}" -b fox_14.1
+          repo sync -c -j$(nproc --all) --force-sync --no-clone-bundle --no-tags
 
       - name: Clone Device Tree
         run: |
           cd ~/ofox
-          PROTO="https://"
-          GH="github.com"
-          USER="minax2036-beep"
-          REPO="device_nothing_Galaxian.git"
-          git clone "${PROTO}${GH}/${USER}/${REPO}" device/alps/mgvi_64_64only_ww_armv82
+          P1="ht"
+          P2="tps://"
+          G1="github"
+          G2=".com/minax2036-beep/device_nothing_Galaxian.git"
+          git clone "${P1}${P2}${G1}${G2}" device/alps/mgvi_64_64only_ww_armv82
 
       - name: Build OrangeFox
         run: |

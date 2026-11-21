@@ -23,9 +23,9 @@ jobs:
           path: |
             ~/ofox
             ~/.ccache
-          key: ofox-14-1-source-v1
+          key: ofox-14-1-slim-v1
           restore-keys: |
-            ofox-14-1-source-
+            ofox-14-1-slim-
 
       - name: Setup Repo & Sync OrangeFox
         if: steps.cache-ofox.outputs.cache-hit != 'true'
@@ -40,7 +40,7 @@ jobs:
           git clone "${P1}${P2}${S1}${S2}" ~/sync
           cd ~/sync
           ./orangefox_sync.sh --branch 14.1 --path ~/ofox
-          rm -rf ~/ofox/.repo
+          rm -rf ~/ofox/.repo ~/ofox/prebuilts/clang/host/linux-x86/clang-r*/*test*
 
       - name: Clone & Patch Device Tree
         run: |
@@ -55,13 +55,14 @@ jobs:
           mv omni_mgvi_64_64only_ww_armv82.mk twrp_mgvi_64_64only_ww_armv82.mk
           sed -i 's/vendor\/omni/vendor\/twrp/g' twrp_mgvi_64_64only_ww_armv82.mk
           sed -i 's/omni_/twrp_/g' AndroidProducts.mk twrp_mgvi_64_64only_ww_armv82.mk
+          sed -i '/PRODUCT_STATIC_BOOT_CONTROL_HAL/d' device.mk
 
       - name: Build OrangeFox
         run: |
           cd ~/ofox
           export USE_CCACHE=1
           export CCACHE_EXEC=/usr/bin/ccache
-          ccache -M 5G
+          ccache -M 3G
           export ALLOW_MISSING_DEPENDENCIES=true
           export FOX_BUILD_DEVICE=mgvi_64_64only_ww_armv82
           export LC_ALL="C"
@@ -76,3 +77,4 @@ jobs:
           path: |
             ~/ofox/out/target/product/mgvi_64_64only_ww_armv82/OrangeFox*.zip
             ~/ofox/out/target/product/mgvi_64_64only_ww_armv82/vendor_boot.img
+

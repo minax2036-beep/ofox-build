@@ -23,9 +23,9 @@ jobs:
           path: |
             ~/ofox
             ~/.ccache
-          key: ofox-14-1-slim-v1
+          key: ofox-14-1-slim-v2
           restore-keys: |
-            ofox-14-1-slim-
+            ofox-14-1-slim-v2-
 
       - name: Setup Repo & Sync OrangeFox
         if: steps.cache-ofox.outputs.cache-hit != 'true'
@@ -59,7 +59,7 @@ jobs:
           cat << 'EOF' >> BoardConfig.mk
 
           AB_OTA_PARTITIONS += boot init_boot vendor_boot dtbo vbmeta vbmeta_system vbmeta_vendor system system_ext product vendor vendor_dlkm odm_dlkm
-          BOARD_BUILD_VENDOR_BOOT_IMAGE := true
+          BOARD_VENDOR_BOOTIMAGE_PARTITION_SIZE := 67108864
           BOARD_USES_RECOVERY_AS_BOOT := true
           BOARD_MOVE_RECOVERY_RESOURCES_TO_VENDOR_BOOT := true
           BOARD_INCLUDE_RECOVERY_DTBO := true
@@ -67,15 +67,14 @@ jobs:
           TW_DEFAULT_BRIGHTNESS := 2048
           EOF
 
-
       - name: Build OrangeFox
         run: |
           cd ~/ofox
           export USE_CCACHE=1
           export CCACHE_EXEC=/usr/bin/ccache
-          export CCACHE_DIR=~/ofox/out/.ccache
+          export CCACHE_DIR=~/.ccache
           mkdir -p "$CCACHE_DIR"
-          ccache -M 3G
+          ccache -M 4G
           export ALLOW_MISSING_DEPENDENCIES=true
           export FOX_BUILD_DEVICE=mgvi_64_64only_ww_armv82
           export LC_ALL="C"
@@ -91,3 +90,8 @@ jobs:
           path: |
             /home/runner/ofox/out/target/product/mgvi_64_64only_ww_armv82/*.img
             /home/runner/ofox/out/target/product/mgvi_64_64only_ww_armv82/*.zip
+
+      - name: Clean Out Dir Before Caching
+        if: always()
+        run: |
+          rm -rf ~/ofox/out

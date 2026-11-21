@@ -59,10 +59,12 @@ jobs:
           cat << 'EOF' >> BoardConfig.mk
 
           AB_OTA_PARTITIONS += boot init_boot vendor_boot dtbo vbmeta vbmeta_system vbmeta_vendor system system_ext product vendor vendor_dlkm odm_dlkm
+          BOARD_USES_RECOVERY_AS_BOOT := true
+          BOARD_MOVE_RECOVERY_RESOURCES_TO_VENDOR_BOOT := true
+          BOARD_INCLUDE_RECOVERY_DTBO := true
           TW_MAX_BRIGHTNESS := 4095
           TW_DEFAULT_BRIGHTNESS := 2048
           EOF
-
 
       - name: Build OrangeFox
         run: |
@@ -78,11 +80,12 @@ jobs:
           source build/envsetup.sh
           lunch twrp_mgvi_64_64only_ww_armv82-ap2a-eng
           mka adbd vendorbootimage
+          ls -lh /home/runner/ofox/out/target/product/mgvi_64_64only_ww_armv82/
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: OrangeFox-vendor_boot
           path: |
-            /home/runner/ofox/out/target/product/mgvi_64_64only_ww_armv82/vendor_boot.img
+            /home/runner/ofox/out/target/product/mgvi_64_64only_ww_armv82/*.img
             /home/runner/ofox/out/target/product/mgvi_64_64only_ww_armv82/*.zip

@@ -16,7 +16,19 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y git aria2 rsync curl zip unzip tar ccache lz4 python3 repo
 
+      - name: Cache OrangeFox Source & CCache
+        id: cache-ofox
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/ofox
+            ~/.ccache
+          key: ofox-14-1-source-v1
+          restore-keys: |
+            ofox-14-1-source-
+
       - name: Setup Repo & Sync OrangeFox
+        if: steps.cache-ofox.outputs.cache-hit != 'true'
         run: |
           git config --global user.name "Builder"
           git config --global user.email "builder@example.com"
@@ -28,9 +40,11 @@ jobs:
           git clone "${P1}${P2}${S1}${S2}" ~/sync
           cd ~/sync
           ./orangefox_sync.sh --branch 14.1 --path ~/ofox
+          rm -rf ~/ofox/.repo
 
       - name: Clone Device Tree
         run: |
+          rm -rf ~/ofox/device/alps/mgvi_64_64only_ww_armv82
           cd ~/ofox
           P1="ht"
           P2="tps://"
@@ -41,11 +55,14 @@ jobs:
       - name: Build OrangeFox
         run: |
           cd ~/ofox
+          export USE_CCACHE=1
+          export CCACHE_EXEC=/usr/bin/ccache
+          ccache -M 5G
           export ALLOW_MISSING_DEPENDENCIES=true
           export FOX_BUILD_DEVICE=mgvi_64_64only_ww_armv82
           export LC_ALL="C"
           source build/envsetup.sh
-          lunch omni_mgvi_64_64only_ww_armv82-eng
+          lunch omni_mgvi_64_64only_ww_armv82-ap2a-eng || lunch omni_mgvi_64_64only_ww_armv82-trunk_staging-eng || lunch omni_mgvi_64_64only_ww_armv82-eng
           mka adbd vendorbootimage
 
       - name: Upload Artifacts
@@ -55,3 +72,4 @@ jobs:
           path: |
             ~/ofox/out/target/product/mgvi_64_64only_ww_armv82/OrangeFox*.zip
             ~/ofox/out/target/product/mgvi_64_64only_ww_armv82/vendor_boot.img
+
